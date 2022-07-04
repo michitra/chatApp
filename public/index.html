@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+    <!-- <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js'></script> -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Kaushan+Script" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+
+    <link rel="stylesheet" href="./stylesheets/login.css" />
+    <link rel="stylesheet" href="./stylesheets/chat.css" />
+    <link rel="stylesheet" href="./stylesheets/usermanagement.css" />
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./javascripts/login.js" defer></script>
+    <script src="./javascripts/chat.js" defer></script>
+    <script src="./javascripts/users.js" defer></script>
+
+    <title>Michael NodeJs Project</title>
+</head>
+
+<body class="scroll">
+    <header class="col-2 text-center">
+        <button class="w3-button w3-xlarge w3-hide-large" onclick="myOpen()">&#9776;</button>
+        <!-- sidebar -->
+        <div id="mySidebar" class="w3-sidebar w3-bar-block w3-collapse w3-card w3-animate-left sidebar shadow1 scroll">
+            <button class="w3-bar-item w3-button w3-hide-large" onclick="myClose()">
+                &times; Close </button>
+            <div>
+                <img src="./images/icon.png" alt="" width="70" height="70"><br>
+            </div>
+            ChatThat
+            <hr><br>
+            <!-- class="hidden" -->
+            <div id="welcome" class="">
+                <h3>WELCOME GUEST</h3><br>
+            </div>
+            <div id="signIn" class="">
+                Not a Member Yet?
+                <a id="signInButton" href="#"><i class="fa fa-fw fa-sign-in" aria-hidden="true"></i> sign-in</a>
+                <!-- <br><br><br><br><br><br><br>
+                <small>&copy; 2022 All rights reserved MICHAEL TRAIVITS</small> -->
+            </div>
+            <div id="backToLogin" class="text-center hidden">
+                <a id="backToLoginButton" href="#"><i class="fa fa-chevron-left" aria-hidden="true"></i> Go Back</a>
+                <!-- <br><br><br><br><br><br><br><br>
+                <small>&copy; 2022 All rights reserved MICHAEL TRAIVITS</small> -->
+            </div>
+
+            <!-- class="hidden" -->
+            <div id="sideBarTags" class="hidden">
+                <h3 id="currentLogin"></h3><br>
+                <a id="chatButton" href="#"><i class="fa fa-fw fa-comments" aria-hidden="true"></i> Chat</a><br>
+                <div id="userButton"><a href="#"><i class="fa fa-fw fa-user" aria-hidden="true"></i> User
+                        Management</a><br></div>
+                <!-- <a id="userButton" href="#"><i class="fa fa-fw fa-user" aria-hidden="true"></i> User Management</a><br> -->
+                <a id="logOutButton" href="#"><i class="fa fa-fw fa-sign-out" aria-hidden="true"></i> Log out</a>
+                <!-- <br><br>
+               <small>&copy; 2022 All rights reserved MICHAEL TRAIVITS</small>  -->
+            </div>
+            <footer class="sidebarfooter">
+                <small>&copy; 2022 All rights reserved MICHAEL TRAIVITS</small>
+                <small><a class="button text-primary text-center" href = "mailto: michaeltra12@gmail.com" style="font-size: 1.0rem; padding:0;">michaeltra12@gmail.com</a></small>
+            </footer>
+        </div>
+    </header>
+
+    <!-- login -->
+    <!-- class="hidden" -->
+    <div id="login" class="col-10 ">
+        <div class="col-lg-6 col-md-6 col-sm-8 mx-auto">
+            <div class="loginform form rounded1 shadow1">
+                <div class="logo mb-3">
+                    <div class="col-md-12 text-center">
+                        <h2>Login</h2>
+                    </div>
+                </div>
+                <form id="loginForm" method="post">
+                    <div class="form-group">
+                        <label for="UserName">User Name</label>
+                        <input id="loginUser" type="email" name="userName" class="form-control" id="userName"
+                            placeholder="Enter User email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input id="loginPassword" type="password" name="password" class="form-control"
+                            placeholder="Enter Password" required>
+                    </div>
+                    <div class="col-md-12 text-center ">
+                        <p id="Invalid">Invalid Email Or Password</p>
+                        <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- chat -->
+    <!-- class="hidden" -->
+    <div id="chat" class="col-10 hidden">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="card shadow1">
+                    <h2 class="card-header rounded1">Chat</h2>
+                    <div class="card-body chat-app">
+                        <div class="col-lg-12">
+                            <div class="people-list scroll">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="btn fa fa-search"
+                                                id="searchBtn"></i></span>
+                                    </div>
+                                    <input type="text" id="searchInput" name="searchInput" class="form-control"
+                                        placeholder="Search...">
+                                </div>
+                                <ul id="plist" class="list-unstyled chat-list mt-2 mb-0 scroll">
+                                    <!-- <li class="clearfix">
+                                        <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="avatar">
+                                        <div class="about">
+                                            <div class="name">Vincent Porter</div>
+                                            <div id="status" class="status"> <i class="fa fa-circle offline"></i> offline</div>
+                                        </div>
+                                    </li>
+                                    <li class="clearfix active">
+                                        <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
+                                        <div class="about">
+                                            <div class="name">Aiden Chavez</div>
+                                            <div class="status"> <i class="fa fa-circle online"></i> online
+                                            </div>
+                                        </div>
+                                    </li> -->
+                                </ul>
+                            </div>
+                            <div class="chat">
+                                <div class="chat-header clearfix">
+                                    <div class="row">
+                                        <div class="col-lg-6" id="chatHeader">
+                                            <img src="./images/user.png" alt="avatar">
+                                            <!-- <div class="chat-about">
+                                                <h6 class="m-b-0">Aiden Chavez</h6>
+                                                 <small>Last seen: 2 hours ago</small>
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="chat-history scroll" id="chatHistory" name="chatHistory">
+                                    <ul class="m-b-0" id="chatBox" name="chatBox">
+                                        <!-- <li class="clearfix">
+                                            <div class="message-data text-right">
+                                                <span class="message-data-time">10:10 AM, Today</span>
+                                                <img src="https://bootdey.com/img/Content/avatar/avatar7.png"
+                                                    alt="avatar">
+                                            </div>
+                                            <div class="message other-message float-right"> Hi Aiden, how
+                                                are you? How is the project coming along? </div>
+                                        </li>
+                                        <li class="clearfix">
+                                            <div class="message-data">
+                                                <span class="message-data-time">10:12 AM, Today</span>
+                                            </div>
+                                            <div class="message my-message">Are we meeting today?</div>
+                                        </li>
+                                        <li class="clearfix">
+                                            <div class="message-data">
+                                                <span class="message-data-time">10:15 AM, Today</span>
+                                            </div>
+                                            <div class="message my-message">Project has been already
+                                                finished and I have results to show you.</div>
+                                        </li> -->
+                                    </ul>
+                                </div>
+                                <div class="chat-message clearfix ">
+                                    <div class="input-group mb-0">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="btn fa fa-send"
+                                                    id="newMessage"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="message" name="message"
+                                            placeholder="Enter text here...">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="btn fa fa-paperclip"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- user management -->
+    <!-- class="hidden" -->
+    <div id="usermanagement" class="col-10 hidden">
+        <h1 id="titleManagment" class="">User Management</h1>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="d-flex justify-content-center">
+                        <div class="usersform rounded1 shadow1">
+                            <div class="logo mb-3">
+                                <div class="col-md-12 text-center">
+                                    <h2>New User</h2>
+                                </div>
+                            </div>
+                            <form id="newUserForm" method="post">
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label for="newUserFName" class="form-label">First Name</label>
+                                        <input type="text" class="form-control name" id="newUserFName"
+                                            pattern="[a-zA-Z]{3,15}" required>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <label for="newUserLName" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control name" id="newUserLName"
+                                            pattern="[a-zA-Z]{3,15}" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label for="NewUserPhoneNumber" class="form-label">Phone Number</label>
+                                        <div class="input-group has-validation ">
+                                            <span class="input-group-text fa fa-phone"></span>
+                                            <input type="text" class="form-control" id="NewUserPhoneNumber"
+                                                pattern="[0-9]{9,10}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <label for="newUserEmail" class="form-label">Email address</label>
+                                        <div class="input-group has-validation ">
+                                            <span class="input-group-text">@</span>
+                                            <input type="email" class="form-control" id="newUserEmail"
+                                                aria-describedby="emailHelp"
+                                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label for="newUserPassword">Password</label>
+                                        <input id="newUserPassword" type="password" name="newUserPassword"
+                                            class="form-control" required>
+                                        <div id="emailHelp" class="form-text">
+                                        </div>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <label for="newUserRole" class="form-label">Role</label>
+                                        <select class="form-select " id="newUserRole">
+                                            <option id="userOpt">User</option>
+                                            <option id="adminOpt">Admin</option>
+                                        </select required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 text-center ">
+                                    <button type="submit" class="btn btn-block mybtn btn-primary tx-tfm">submit</button>
+                                </div>
+                            </form>
+
+                            <div id="deleteCard" class="">
+                                <hr>
+                                <div class="logo mb-3">
+                                    <div class="col-md-12 text-center">
+                                        <h2>Delete User</h2>
+                                    </div>
+                                </div>
+                                <form id="deleteForm" method="post">
+                                    <div class="row">
+                                        <div class="col-5 mb-3 text-center">
+                                            <label for="DeleteUser" class="form-label ">User's Email</label>
+                                        </div>
+                                        <div class="col-7 mb-3">
+                                            <div class="input-group has-validation ">
+                                                <span class="input-group-text">@</span>
+                                                <input type="email" class="form-control" id="DeleteUser"
+                                                    aria-describedby="emailHelp"
+                                                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 text-center">
+                                        <button type="submit"
+                                            class=" btn btn-block mybtn btn-primary tx-tfm">Delete</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="updateCard" class="col">
+                    <div class="d-flex justify-content-center">
+                        <div class="usersform rounded1 shadow1">
+                            <div class="logo mb-3">
+                                <div class="col-md-12 text-center">
+                                    <h2>Update User</h2>
+                                </div>
+                            </div>
+                            <form id="UpdateForm" method="post">
+                                <div class="row">
+                                    <div class="col mb-3">
+                                        <label for="UpdateChooseUser" class="form-label">User To Update</label>
+                                        <select class="form-select" id="UpdateChooseUser">
+
+                                        </select required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label for="UpdateUserFName" class="form-label">First Name</label>
+                                        <input type="text" class="form-control name" id="UpdateUserFName"
+                                            pattern="[a-zA-Z]{3,15}" required>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <label for="UpdateUserLName" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control name" id="UpdateUserLName"
+                                            pattern="[a-zA-Z]{3,15}" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col mb-3">
+                                        <label for="UpdateUserPhoneNumber" class="form-label">Phone Number</label>
+                                        <div class="input-group has-validation ">
+                                            <span class="input-group-text fa fa-phone"></span>
+                                            <input type="text" class="form-control" id="UpdateUserPhoneNumber"
+                                                pattern="[0-9]{9,10}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col mb-3">
+                                        <label for="UpdateUserEmail" class="form-label">Email address</label>
+                                        <div class="input-group has-validation ">
+                                            <span class="input-group-text">@</span>
+                                            <input type="email" class="form-control" id="UpdateUserEmail"
+                                                aria-describedby="emailHelp"
+                                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label for="UpdateUserPassword">Password</label>
+                                        <input id="UpdateUserPassword" type="password" name="UpdateUserPassword"
+                                            placeholder="New Password..." class="form-control" required>
+                                        <div id="emailHelp" class="form-text">
+                                        </div>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <label for="UpdateUserRole" class="form-label">Role</label>
+                                        <select class="form-select" id="UpdateUserRole">
+                                            <option>User</option>
+                                            <option>Admin</option>
+                                        </select required>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 text-center ">
+                                    <button type="submit"
+                                        class=" btn btn-block mybtn btn-primary tx-tfm">Update</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,163 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../ProjectApp');
+var debug = require('debug')('app:server');
+var http = require('http');
+//const fs = require('fs');
+//const https = require('https');
+//const url = require("url");
+
+// const privateKey = fs.readFileSync('/etc/letsencrypt/live/rtfs0620.xyz/privkey.pem', 'utf8');
+// const certificate = fs.readFileSync('/etc/letsencrypt/live/rtfs0620.xyz/cert.pem', 'utf8');
+// const ca = fs.readFileSync('/etc/letsencrypt/live/rtfs0620.xyz/chain.pem', 'utf8');
+// const credentials = {
+// key: privateKey,
+// cert: certificate,
+// ca: ca
+// };
+
+const { chatController } = require('../controllers/chatController');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP, HTTPS server.
+ */
+//change to serverHTTP
+var server = http.createServer(app);
+// const server = https.createServer(credentials, app);
+
+const mongoose = require('mongoose');
+//connect DB 
+mongoose.connect('mongodb+srv://michaeltra:VwLJKpDB9D6zVhX@cluster0.i7jd5.mongodb.net/?retryWrites=true&w=majority', {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+})
+  .then(() => {
+    /**
+    * Listen on provided port, on all network interfaces.
+    */
+    console.log('Mongodb Started')
+    server.listen(port);
+    server.on('error', onError);
+    server.on('listening', onListening);
+  })
+  .catch(err => {
+    console.log("DB connection Error", err.message);
+  });
+
+
+/*
+* Socket IO
+*/
+
+const { Server } = require("socket.io");
+const io = new Server(server);
+
+
+let connectedUsers = [];
+io.on('connection', (socket) => {
+  console.log('a user connected');
+
+  socket.on("user login", (thisUserMail) => {
+    //enter login user to the list
+    connectedUsers.push(thisUserMail)
+    console.log('connectedUsers ', connectedUsers);
+    socket.broadcast.emit("user login", thisUserMail);
+    io.to(socket.id).emit('connected list', connectedUsers);
+  })
+
+  let index;
+  socket.on('logout', (thisUserMail) => {
+    index = connectedUsers.indexOf(thisUserMail)
+    //delete logout user from the list
+    connectedUsers.splice(index, 1);
+    //Checks if the user does not appear in the array (in case he connected from more than one device)
+    if (!(connectedUsers.includes(thisUserMail))) {
+      io.emit("user logout", thisUserMail);
+    }
+    console.log('connectedUsers ', connectedUsers);
+  })
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+
+  socket.on('message', (msg) => {
+    console.log('recived message in server:', msg);
+    //save message in db
+    chatController.newMessage(msg, (data) => { console.log('message saved to db:' ,data); })
+    //emit the message to the relevant users
+    io.emit('message', msg)
+  });
+  
+});
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
